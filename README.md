@@ -32,8 +32,8 @@ CORE
 │   ├── cc_baselines        # baselines
 │   ├── cc_evaluation       # evaluation metrics of CC test detection
 │   ├── core.py
-│   ├── CORE     				 # our approach
-│   └── ablation_exp			 # ablation experiment
+│   ├── CORE                # our approach
+│   └── ablation_exp        # ablation experiment
 ├── fl_evaluation   # the suspicious evaluation of AFL
 ├── read_data       # read data
 └── utils           
