@@ -17,7 +17,6 @@ class CCGroundTruthPipeline(ReadData):
         # data_df = self.data_obj.data_df
         # fault_line = self.data_obj.fault_line
 
-        # 筛选出成功测试用例, and init all_cc_index
         passing_df = self.data_df[self.data_df["error"] == 0]
         self.ground_truth_cc_index = pd.Series(np.array(np.zeros(len(passing_df)), dtype=bool), index=passing_df.index)
 
@@ -33,9 +32,8 @@ class CCGroundTruthPipeline(ReadData):
         data = self.data_obj
         data_df = data.data_df
         fault_line = data.fault_line
-        # 筛选出成功测试用例
+        
         passing_df = data_df[data_df["error"] == 0]
-        # 找到偶然正确性测试用例，经过了有缺陷代码行的所有标定为正确的测试用例
         all_line = np.array(data.feature_df.columns)
         for line in fault_line:
             if line not in all_line:
