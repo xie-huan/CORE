@@ -85,7 +85,6 @@ class ExpertFeatureCombinedIdentify(BaseCCPipeline):
         k = 5
         part_size = math.ceil(size / k)
 
-        # 依次取出
         for i in range(k):
             start = i * part_size
             end = (i + 1) * part_size if i < k - 1 else size

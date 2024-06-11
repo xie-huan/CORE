@@ -96,7 +96,6 @@ class EFCIdentify(BaseCCPipeline):
                     continue
                 CCE.append("error")
                 # new_data_df = ccpl.data_df[CCE]
-                # 使用文件的方式导入ssp,cr,sf特征矩阵信息
                 ssp, cr, sf = FeatureTestsHandler.get_feature_from_file(project_dir, ccpl.program,
                                                                         ccpl.bug_id)
                 ssp, cr, sf = ssp.values, cr.values, sf.values
@@ -154,7 +153,6 @@ class EFCIdentify(BaseCCPipeline):
                 # self.train(train_loader, mnet, criterion, optimizer, cc_target, epoch)
                 self._train_mnet(train_loader, mnet, criterion, optimizer, epoch)
 
-            # 逐一训练ccpl
             rtd = ReadTrainData(self.project_dir, item, self.way)
             train_list = rtd.ccpls
             # self._test_(model, test_rtd)
@@ -314,7 +312,6 @@ class EFCIdentify(BaseCCPipeline):
             # compute output
             prob = mnet(ssp, cr, sf)
 
-            # 将张量组织成prob.shape形状的的浮点型序列
             target = target.float().view(prob.shape)
 
             if args.cuda:

@@ -85,7 +85,6 @@ class EFCIdentifyWithoutExpertFeature(BaseCCPipeline):
         k = 5
         part_size = math.ceil(size / k)
 
-        # 依次取出
         for i in range(k):
             start = i * part_size
             end = (i + 1) * part_size if i < k - 1 else size
@@ -223,3 +222,4 @@ class EFCIdentifyWithoutExpertFeature(BaseCCPipeline):
         true_passing_list = list(sum_df[sum_df == 0].index)
         return data_df.iloc[true_passing_list, :].astype('float32'), data_df.iloc[cc_candidate_list, :].astype(
             'float32')
+ 

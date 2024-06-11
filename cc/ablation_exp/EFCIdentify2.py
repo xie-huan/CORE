@@ -50,17 +50,7 @@ parser.add_argument('--name', default='MLPDFLCCNet', type=str,
 args = parser.parse_args()
 
 
-# def setup_seed(seed):
-#     torch.manual_seed(seed)
-#     torch.cuda.manual_seed_all(seed)
-#     np.random.seed(seed)
-#     random.seed(seed)
-#     torch.backends.cudnn.deterministic = True
-#
-# # 设置随机数种子
-# setup_seed(20)
-
-# 将覆盖语义和专家特征分开训练，将两份结果取或
+ 
 class EFCIdentify2(BaseCCPipeline):
     def __init__(self, project_dir, configs, cita, way, K , M):
         super().__init__(project_dir, configs, way)
@@ -71,9 +61,7 @@ class EFCIdentify2(BaseCCPipeline):
         self.train_config_list = []
         self.test_config_list = []
         self.test_part_list = []
-        # 存放各版本和具体ccpl对象信息的map, key形如"Chart-1", value: 对象ccpl{}
         self.ccpl4vote = {}
-        # 存放各版本和cc_target映射关系的map，key形如"Chart-1"
         self.target4vote = {}
 
     def _find_cc_index(self):
@@ -88,7 +76,6 @@ class EFCIdentify2(BaseCCPipeline):
         for i in range(self.K):
             self.train_test_config_list.append([])
 
-        # 将输入的program划分为k个组
         for i in range(program_len):
             config = {'-d': 'd4j', '-p': program, '-i': str(info_list[i]), '-m': program_method,
                       '-e': 'origin'}
@@ -96,7 +83,6 @@ class EFCIdentify2(BaseCCPipeline):
 
         # start = time.time()
         for item in self.train_test_config_list:
-            # item为测试组，其余K-1个组为训练组
             train_list = self.train_test_config_list.copy()
             train_list.remove(item)
 
@@ -107,7 +93,6 @@ class EFCIdentify2(BaseCCPipeline):
             train_cr_list = []
             train_sf_list = []
             train_cc_target_list = []
-            # 遍历每一个待训练的版本，生成Dataloader需要的数据
             for ccpl in train_rtd.ccpls:
                 CCE = find_CCE(ccpl)
                 train_CCE_list.append(CCE)
@@ -115,7 +100,6 @@ class EFCIdentify2(BaseCCPipeline):
                     continue
                 CCE.append("error")
                 # new_data_df = ccpl.data_df[CCE]
-                # 使用文件的方式导入ssp,cr,sf特征矩阵信息
                 ssp, cr, sf = FeatureTestsHandler.get_feature_from_file(project_dir, ccpl.program,
                                                                         ccpl.bug_id)
                 ssp, cr, sf = ssp.values, cr.values, sf.values
@@ -171,7 +155,6 @@ class EFCIdentify2(BaseCCPipeline):
                 self.train_mnet(train_loader, mnet, criterion, optimizer, epoch)
             self.test_mnet(mnet, test_rtd)
 
-            # 遍历test_rtd中的每一个版本
             for ccpl in test_rtd.ccpls:
                 CCE = find_CCE(ccpl)
                 if len(CCE) == 0:
@@ -184,7 +167,6 @@ class EFCIdentify2(BaseCCPipeline):
 
                 size = ccpl.ground_truth_cc_index.shape[0]
 
-                # 划分参与训练的样本和测试样本，默认为8:2
                 indices = ccpl.ground_truth_cc_index.index.to_numpy()
                 np.random.shuffle(indices)
                 indices = indices.tolist()
@@ -199,7 +181,6 @@ class EFCIdentify2(BaseCCPipeline):
                     train_index_list[i % k].append(item)
 
                 for i, test_index in enumerate(train_index_list):
-                    # 加载train_index和train_target数据
                     train_index = []
                     for j, array in enumerate(train_index_list):
                         if j != i:
@@ -248,9 +229,6 @@ class EFCIdentify2(BaseCCPipeline):
 
                     # train the model
                     self.test_cnet(ccpl, cover_info_net, test_index)
-                # 记录当前遍历版本的输出结果
-                # 记录遍历的版本和ccpl的映射是为了在vote方法中修改ccpl的target
-                # 记录遍历的版本和所有轮次的cc_index的输出结果，以便vote
                 key = ccpl.program + ccpl.bug_id
                 if key not in self.target4vote:
                     self.target4vote[key] = []
@@ -277,7 +255,6 @@ class EFCIdentify2(BaseCCPipeline):
 
             # target = target[:, 1]
             # target = torch.from_numpy(target.values)
-            # 将张量组织成prob.shape形状的的浮点型序列
             target = target.float().view(prob.shape)
 
             if args.cuda:
